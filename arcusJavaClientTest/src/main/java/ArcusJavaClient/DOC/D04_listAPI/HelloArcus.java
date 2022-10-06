@@ -24,6 +24,7 @@ public class HelloArcus {
 
         //start
         String key = "Sample:EmptyList";
+        //test
 
         CollectionFuture<Boolean> future = null;
         CollectionAttributes attribute = new CollectionAttributes();

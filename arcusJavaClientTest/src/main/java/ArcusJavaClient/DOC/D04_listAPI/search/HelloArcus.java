@@ -1,14 +1,15 @@
-package ArcusJavaClient.DOC.D04_listAPI;
+package ArcusJavaClient.DOC.D04_listAPI.search;
 
 import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -23,17 +24,15 @@ public class HelloArcus {
 
 
         //start
-        String key = "Sample:EmptyList";
-        //test
-        //53w5
-
-        CollectionFuture<Boolean> future = null;
-        CollectionAttributes attribute = new CollectionAttributes();
+        String key = "Sample:List";
+        int from = 0;
+        int to = 5;
+        boolean withDelete = false;
+        boolean dropIfEmpty = false;
+        CollectionFuture<List<Object>> future = null;
 
         try {
-            future = hello.arcusClient.asyncLopCreate(key, ElementValueType.OTHERS, attribute); // (1)
-//            attribute.
-//            future = hello.arcusClient.asyncLopCreate()
+            future = hello.arcusClient.asyncLopGet(key, from, to, withDelete, dropIfEmpty); // (1)
         } catch (IllegalStateException e) {
             // handle exception
         }
@@ -42,22 +41,24 @@ public class HelloArcus {
             return;
 
         try {
-            System.out.println("TEST RESULT START");
-            Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
+            List<Object> result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
             System.out.println(result);
-            System.out.println(future.getOperationStatus().getResponse()); // (3)
-            System.out.println("TEST RESULT END");
-        } catch (TimeoutException e) {
-            System.out.println("e = " + e);
-            future.cancel(true);
+            CollectionResponse response = future.getOperationStatus().getResponse();  // (3)
+            System.out.println(response);
+
+            if (response.equals(CollectionResponse.NOT_FOUND)) {
+                System.out.println("Key가 없습니다.(Key에 저장된 List가 없습니다.");
+            } else if (response.equals(CollectionResponse.NOT_FOUND_ELEMENT)) {
+                System.out.println("Key는 존재하지만 List에 저장된 값 중 조건에 맞는 것이 없습니다.");
+            }
+
         } catch (InterruptedException e) {
-            System.out.println("e = " + e);
+            future.cancel(true);
+        } catch (TimeoutException e) {
             future.cancel(true);
         } catch (ExecutionException e) {
-            System.out.println("e = " + e);
             future.cancel(true);
         }
-
 
         //end
 

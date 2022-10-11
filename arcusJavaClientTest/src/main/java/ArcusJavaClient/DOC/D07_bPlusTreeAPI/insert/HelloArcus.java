@@ -1,4 +1,4 @@
-package ArcusJavaClient.DOC.D04_listAPI.insert;
+package ArcusJavaClient.DOC.D07_bPlusTreeAPI.insert;
 
 import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
@@ -22,18 +22,17 @@ public class HelloArcus {
 
 
         //start
-        String key = "Sample:List";
-        int index = -1;
-        String value = "This is a value2.";
+        String key = "Prefix:BTreeKey";
+        long bkey = 1L;
+        String value = "This is a value.";
+        byte[] eflag = new byte[] { 1, 1, 1, 1 };
+
         CollectionAttributes attributesForCreate = new CollectionAttributes();
         CollectionFuture<Boolean> future = null;
 
         try {
-            future = hello.arcusClient.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate); // (1)
-            Thread.sleep(2000);
-            future = hello.arcusClient.asyncLopInsert(key, index, value, attributesForCreate); // (1)
-            Thread.sleep(2000);
-        } catch (IllegalStateException | InterruptedException e) {
+            future = hello.arcusClient.asyncBopInsert(key, bkey, eflag, value, attributesForCreate); // (1)
+        } catch (IllegalStateException e) {
             // handle exception
         }
 
@@ -51,7 +50,6 @@ public class HelloArcus {
         } catch (ExecutionException e) {
             future.cancel(true);
         }
-
 
         //end
 

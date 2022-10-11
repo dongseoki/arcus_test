@@ -13,7 +13,7 @@ import java.util.concurrent.TimeoutException;
 
 public class HelloArcus {
 
-    private static final String ARCUS_ADMIN = "127.0.0.1:2181";
+    private static final String ARCUS_ADMIN = "127.0.0.1:3181";
     private static final String SERVICE_CODE = "test";
     private final ArcusClient arcusClient;
 

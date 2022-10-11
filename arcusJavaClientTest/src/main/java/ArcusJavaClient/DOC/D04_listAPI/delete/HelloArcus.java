@@ -1,8 +1,9 @@
-package ArcusJavaClient.DOC.D04_listAPI.insert;
+package ArcusJavaClient.DOC.D04_listAPI.delete;
 
 import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.transcoders.SerializingTranscoder;
@@ -23,17 +24,14 @@ public class HelloArcus {
 
         //start
         String key = "Sample:List";
-        int index = -1;
-        String value = "This is a value2.";
-        CollectionAttributes attributesForCreate = new CollectionAttributes();
+        int from = -1;
+        int to = -1;
+        boolean dropIfEmpty = false;
         CollectionFuture<Boolean> future = null;
 
         try {
-            future = hello.arcusClient.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate); // (1)
-            Thread.sleep(2000);
-            future = hello.arcusClient.asyncLopInsert(key, index, value, attributesForCreate); // (1)
-            Thread.sleep(2000);
-        } catch (IllegalStateException | InterruptedException e) {
+            future = hello.arcusClient.asyncLopDelete(key, from, to, dropIfEmpty); // (1)
+        } catch (IllegalStateException e) {
             // handle exception
         }
 
@@ -41,17 +39,19 @@ public class HelloArcus {
             return;
 
         try {
-            Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
+            boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
             System.out.println(result);
-            System.out.println(future.getOperationStatus().getResponse()); // (3)
-        } catch (TimeoutException e) {
-            future.cancel(true);
+
+            CollectionResponse response = future.getOperationStatus().getResponse(); // (3)
+            System.out.println(response);
         } catch (InterruptedException e) {
+            future.cancel(true);
+        } catch (TimeoutException e) {
             future.cancel(true);
         } catch (ExecutionException e) {
             future.cancel(true);
         }
-
+        //
 
         //end
 

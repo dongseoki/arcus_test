@@ -1,12 +1,14 @@
-package ArcusJavaClient.DOC.D04_listAPI.insert;
+package ArcusJavaClient.DOC.D07_bPlusTreeAPI.create;
 
 import net.spy.memcached.ArcusClient;
 import net.spy.memcached.ConnectionFactoryBuilder;
 import net.spy.memcached.collection.CollectionAttributes;
+import net.spy.memcached.collection.CollectionResponse;
 import net.spy.memcached.collection.ElementValueType;
 import net.spy.memcached.internal.CollectionFuture;
 import net.spy.memcached.transcoders.SerializingTranscoder;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -22,18 +24,14 @@ public class HelloArcus {
 
 
         //start
-        String key = "Sample:List";
-        int index = -1;
-        String value = "This is a value2.";
-        CollectionAttributes attributesForCreate = new CollectionAttributes();
+        String key = "Sample:EmptyBTree";
         CollectionFuture<Boolean> future = null;
+        CollectionAttributes attribute = new CollectionAttributes(); // (1)
+        attribute.setExpireTime(60); // (1)
 
         try {
-            future = hello.arcusClient.asyncLopCreate(key, ElementValueType.STRING, attributesForCreate); // (1)
-            Thread.sleep(2000);
-            future = hello.arcusClient.asyncLopInsert(key, index, value, attributesForCreate); // (1)
-            Thread.sleep(2000);
-        } catch (IllegalStateException | InterruptedException e) {
+            future = hello.arcusClient.asyncBopCreate(key, ElementValueType.STRING, attribute); // (2)
+        } catch (IllegalStateException e) {
             // handle exception
         }
 
@@ -41,9 +39,9 @@ public class HelloArcus {
             return;
 
         try {
-            Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (2)
+            Boolean result = future.get(1000L, TimeUnit.MILLISECONDS); // (3)
             System.out.println(result);
-            System.out.println(future.getOperationStatus().getResponse()); // (3)
+            System.out.println(future.getOperationStatus().getResponse()); // (4)
         } catch (TimeoutException e) {
             future.cancel(true);
         } catch (InterruptedException e) {
@@ -51,7 +49,6 @@ public class HelloArcus {
         } catch (ExecutionException e) {
             future.cancel(true);
         }
-
 
         //end
 

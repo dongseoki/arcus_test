@@ -39,6 +39,12 @@ public class CountDownLatchExample {
         @Override
         public void run() {
             System.out.println("Do something (tid: " + Thread.currentThread().getId() + ")");
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("Do something (tid: " + Thread.currentThread().getId() + ")" + " end!");
             countDownLatch.countDown();
         }
     }
